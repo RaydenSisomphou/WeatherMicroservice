@@ -72,3 +72,4 @@ class WeatherService:
         except requests.exceptions.RequestException as e:
             print(f"Error retrieving 5-day forecast: {e}")
             return None
+# v2
