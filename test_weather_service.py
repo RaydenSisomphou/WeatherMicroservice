@@ -35,7 +35,7 @@ def test_weather_service():
 
     elif choice == '2':
         # Get 5-day forecast
-        forecast = weather_service.get_5_day_forecast(lat, lon)  # Change to get_5_day_forecast
+        forecast = weather_service.get_5_day_forecast(lat, lon)
 
         if forecast:
             print(f"\n5-Day Forecast for {city_name}:")
@@ -44,7 +44,7 @@ def test_weather_service():
                 temperature = day['temp']
                 weather_description = day['weather']
 
-                # Convert timestamp to readable date with timezone-aware object
+                # Convert timestamp to readable date
                 date = datetime.fromtimestamp(time, timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
 
                 print(f"Date: {date}, Temp: {temperature}°C, Weather: {weather_description}")
@@ -55,6 +55,6 @@ def test_weather_service():
         print("Invalid choice. Please enter 1 or 2.")
 
 
-# Run the test
+# Run
 if __name__ == "__main__":
     test_weather_service()

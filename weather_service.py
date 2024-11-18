@@ -7,7 +7,7 @@ load_dotenv()
 
 class WeatherService:
     def __init__(self):
-        # The API key is stored in the .env file for security
+        # The API key is stored in the .env file for security but can just be entered here
         self.api_key = os.getenv("WEATHER_API_KEY")
         self.geo_url = "http://api.openweathermap.org/data/2.5/weather"
         self.forecast_url = "http://api.openweathermap.org/data/2.5/forecast"
@@ -58,8 +58,7 @@ class WeatherService:
             response.raise_for_status()
             data = response.json()
 
-            # Return the list of daily forecasts (up to 5 days)
-            # The OpenWeatherMap API returns data in 3-hour intervals
+            # Return the list of daily forecasts, the OpenWeatherMap API returns data in 3-hour intervals
             forecast = []
             for i in range(0, len(data['list']), 8):  # Every 8th entry is a 24-hour period (3 hours * 8 = 24)
                 day = data['list'][i]
@@ -73,57 +72,3 @@ class WeatherService:
         except requests.exceptions.RequestException as e:
             print(f"Error retrieving 5-day forecast: {e}")
             return None
-
-
-def test_weather_service():
-    # Initialize the WeatherService class
-    weather_service = WeatherService()
-
-    # Step 1: Get city name from user input
-    city_name = input("Enter the city name: ")
-
-    # Step 2: Get city coordinates using the WeatherService
-    lat, lon = weather_service.get_coordinates(city_name)
-
-    if lat is None or lon is None:
-        print("City not found. Please check the city name and try again.")
-        return
-
-    # Step 3: Ask if user wants current weather or 7-day forecast
-    print("\n1. Current Weather")
-    print("2. 7 Day Forecast")
-    choice = input("Enter your choice (1 or 2): ")
-
-    if choice == '1':
-        # Get current weather
-        current_weather = weather_service.get_current_weather(lat, lon)
-        if current_weather:
-            print(f"\nWeather in {city_name}:")
-            print(f"Temperature: {current_weather['main']['temp']}°C")
-            print(f"Weather Conditions: {current_weather['weather'][0]['description']}")
-            print(f"Humidity: {current_weather['main']['humidity']}%")
-            print(f"Wind Speed: {current_weather['wind']['speed']} m/s")
-        else:
-            print("Error retrieving current weather.")
-
-    elif choice == '2':
-        # Get 7-day forecast
-        forecast = weather_service.get_7_day_forecast(lat, lon)
-
-        if forecast:
-            print(f"\n7-Day Forecast for {city_name}:")
-            for day in forecast:
-                time = day['dt']  # This will be a timestamp, can be converted to readable date
-                temperature = day['temp']['day']
-                weather_description = day['weather'][0]['description']
-                print(f"Date: {time}, Temp: {temperature}°C, Weather: {weather_description}")
-        else:
-            print("Error retrieving 7-day forecast.")
-
-    else:
-        print("Invalid choice. Please enter 1 or 2.")
-
-
-# Run the test
-if __name__ == "__main__":
-    test_weather_service()
