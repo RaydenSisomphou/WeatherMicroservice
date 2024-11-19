@@ -58,4 +58,3 @@ def test_weather_service():
 # Run
 if __name__ == "__main__":
     test_weather_service()
-#
