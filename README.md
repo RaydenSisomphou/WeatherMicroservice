@@ -96,5 +96,5 @@ Responses are in JSON format.
 ```
 
 # UML Sequence Diagram
+![UML_Sequence_Diagram](https://github.com/user-attachments/assets/d4d4bcf2-92a5-4bb0-83a9-6746571b08b7)
 
-![UML Sequence Diagram]([UML_Sequence_Diagram.png](https://github.com/RaydenSisomphou/WeatherMicroservice/blob/main/UML_Sequence_Diagram.png))
