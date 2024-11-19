@@ -96,3 +96,5 @@ Responses are in JSON format.
 ```
 
 # UML Sequence Diagram
+
+![UML Sequence Diagram](UML%20Sequence%20Diagram.png)
