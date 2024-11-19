@@ -6,7 +6,7 @@ To request data from the WeatherService, you can use the following HTTP GET requ
 
 Get Current Weather:
 
-Endpoint: /weather
+Endpoint: (https://api.openweathermap.org/data/2.5/weather)
 Method: GET
 Parameters: city_name (required): The name of the city you want to retrieve weather data for.
 Example Call:
@@ -15,7 +15,7 @@ import requests
 
 city_name = "Seattle"
 api_key = "your_api_key_here"
-response = requests.get(f"http://yourdomain.com/weather?city_name={city_name}&appid={api_key}")
+response = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}")
 
 if response.status_code == 200:
     data = response.json()
@@ -35,10 +35,60 @@ import requests
 
 city_name = "Seattle"
 api_key = "your_api_key_here"
-response = requests.get(f"http://yourdomain.com/forecast?city_name={city_name}&appid={api_key}")
+response = requests.get(f"https://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={api_key}")
 
 if response.status_code == 200:
     forecast = response.json()
     print(forecast)
 else:
     print(f"Failed to retrieve data: {response.status_code}")
+
+# Receiving Data from the Microservice:
+
+Responses are in JSON format. 
+
+Receive Current Weather 
+{
+  "main": {
+    "temp": 15.5,
+    "humidity": 82
+  },
+  "weather": [
+    {
+      "description": "light rain"
+    }
+  ],
+  "wind": {
+    "speed": 4.1
+  }
+}
+
+
+Receive %-Day Weather Forecast 
+{
+  "list": [
+    {
+      "dt": 1697635200,
+      "main": {
+        "temp": 14.0
+      },
+      "weather": [
+        {
+          "description": "clear sky"
+        }
+      ]
+    },
+    {
+      "dt": 1697721600,
+      "main": {
+        "temp": 16.0
+      },
+      "weather": [
+        {
+          "description": "few clouds"
+        }
+      ]
+    }
+  ]
+}
+
