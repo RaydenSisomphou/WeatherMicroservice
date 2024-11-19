@@ -4,13 +4,13 @@ This README provides the communication contract for the weather microservice tha
 # Requesting Data from the Microservice:
 To request data from the WeatherService, you can use the following HTTP GET requests. You need to call the API with the city name to retrieve the weather information.
 
-Get Current Weather:
+## Get Current Weather:
 
 Endpoint: (https://api.openweathermap.org/data/2.5/weather)
 Method: GET
 Parameters: city_name (required): The name of the city you want to retrieve weather data for.
 Example Call:
-
+```python
 import requests
 
 city_name = "Seattle"
@@ -22,15 +22,15 @@ if response.status_code == 200:
     print(data)
 else:
     print(f"Failed to retrieve data: {response.status_code}")
+```
 
-
-Get 5-Day Weather Forecast:
+## Get 5-Day Weather Forecast:
 
 Endpoint: /forecast
 Method: GET
 Parameters:city_name (required): The name of the city you want to retrieve the forecast for.
 Example Call:
-
+```python 
 import requests
 
 city_name = "Seattle"
@@ -42,12 +42,13 @@ if response.status_code == 200:
     print(forecast)
 else:
     print(f"Failed to retrieve data: {response.status_code}")
-
+```
 # Receiving Data from the Microservice:
 
 Responses are in JSON format. 
 
-Receive Current Weather 
+## Receive Current Weather 
+```python
 {
   "main": {
     "temp": 15.5,
@@ -62,9 +63,10 @@ Receive Current Weather
     "speed": 4.1
   }
 }
+```
 
-
-Receive %-Day Weather Forecast 
+## Receive 5-Day Weather Forecast 
+```python
 {
   "list": [
     {
@@ -91,4 +93,6 @@ Receive %-Day Weather Forecast
     }
   ]
 }
+```
 
+# UML Sequence Diagram
