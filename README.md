@@ -1,21 +1,21 @@
 # Weather Microservice Communication Contract
-This README provides the communication contract for the weather microservice that I implemented. It includes clear instructions for requesting and receiving data from the microservice, and a UML sequence diagram to illustrate the flow of communication.
+This README provides the communication contract outlining the API endpoints and data formats for interacting with the weather microservice, providing city coordinates and 5-day weather forecasts.
 
-# Requesting Data from the Microservice:
+# Requesting Data from the Microservice using REST API:
 To request data from the WeatherService, you can use the following HTTP GET requests. You need to call the API with the city name to retrieve the weather information.
 
 ## Get Current Weather:
 
 Endpoint: (https://api.openweathermap.org/data/2.5/weather)
 Method: GET
-Parameters: city_name (required): The name of the city you want to retrieve weather data for.
+Parameters: 
+    city: Name of the city.
 Example Call:
 ```python
 import requests
 
 city_name = "Seattle"
-api_key = "your_api_key_here"
-response = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}")
+response = requests.get(f"http://127.0.0.1:5000/get-coordinates?city={city_name}")
 
 if response.status_code == 200:
     data = response.json()
@@ -28,14 +28,16 @@ else:
 
 Endpoint: /forecast
 Method: GET
-Parameters:city_name (required): The name of the city you want to retrieve the forecast for.
+Parameters:
+    lat: Latitude.
+    lon: Longitude.
 Example Call:
 ```python 
 import requests
 
-city_name = "Seattle"
-api_key = "your_api_key_here"
-response = requests.get(f"https://api.openweathermap.org/data/2.5/forecast?q={city_name}&appid={api_key}")
+lat = 47.6067
+lon = -122.3321
+response = requests.get(f"http://127.0.0.1:5000/5-day-forecast?lat={lat}&lon={lon}")
 
 if response.status_code == 200:
     forecast = response.json()
@@ -47,52 +49,39 @@ else:
 
 Responses are in JSON format. 
 
-## Receive Current Weather 
+## Receive City Coordinates
 ```python
 {
-  "main": {
-    "temp": 15.5,
-    "humidity": 82
-  },
-  "weather": [
-    {
-      "description": "light rain"
-    }
-  ],
-  "wind": {
-    "speed": 4.1
-  }
+  "latitude": 47.6067,
+  "longitude": -122.3321
 }
 ```
 
 ## Receive 5-Day Weather Forecast 
 ```python
-{
-  "list": [
-    {
-      "dt": 1697635200,
-      "main": {
-        "temp": 14.0
-      },
-      "weather": [
-        {
-          "description": "clear sky"
-        }
-      ]
-    },
-    {
-      "dt": 1697721600,
-      "main": {
-        "temp": 16.0
-      },
-      "weather": [
-        {
-          "description": "few clouds"
-        }
-      ]
+
+[
+  {
+    "dt": 1697635200,
+    "temp": 14.0,
+    "weather": "clear sky",
+    "wind": 4.1,
+    "main": {
+      "temp": 14.0,
+      "humidity": 82
     }
-  ]
-}
+  },
+  {
+    "dt": 1697721600,
+    "temp": 16.0,
+    "weather": "few clouds",
+    "wind": 4.1,
+    "main": {
+      "temp": 16.0,
+      "humidity": 80
+    }
+  }
+]
 ```
 
 # UML Sequence Diagram
