@@ -1,74 +1,77 @@
 import os
 import requests
 from dotenv import load_dotenv
+from flask import Flask, jsonify, request
 
-# Load environment variables
-load_dotenv()
+load_dotenv()  # Load api key from .env file
+
+app = Flask(__name__)  # Initialize Flask app
+
 
 class WeatherService:
     def __init__(self):
-        # The API key is stored in the .env file for security but can just be entered here
+        # Initialize API key and URLs for weather data
         self.api_key = os.getenv("WEATHER_API_KEY")
-        self.geo_url = "http://api.openweathermap.org/data/2.5/weather"
         self.forecast_url = "http://api.openweathermap.org/data/2.5/forecast"
+        self.geocode_url = "http://api.openweathermap.org/geo/1.0/direct"
 
     def get_coordinates(self, city_name):
-        # Get coordinates of the city
+        # Get latitude and longitude for a given city
         params = {
             'q': city_name,
+            'limit': 1,
             'appid': self.api_key
         }
-        try:
-            response = requests.get(self.geo_url, params=params)
-            response.raise_for_status()  # Will raise an exception for bad status
-            data = response.json()
-            lat = data['coord']['lat']
-            lon = data['coord']['lon']
-            return lat, lon
-        except requests.exceptions.RequestException as e:
-            print(f"Error retrieving coordinates: {e}")
-            return None, None
-
-    def get_current_weather(self, lat, lon):
-        # Fetch current weather data for a given city
-        params = {
-            "lat": lat,
-            "lon": lon,
-            "appid": self.api_key,
-            "units": "metric"
-        }
-        try:
-            response = requests.get(self.geo_url, params=params)
-            response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            print(f"Error retrieving current weather: {e}")
-            return None
+        response = requests.get(self.geocode_url, params=params)
+        response.raise_for_status()  # Check for errors
+        data = response.json()
+        return data[0]['lat'], data[0]['lon']  # Return coordinates
 
     def get_5_day_forecast(self, lat, lon):
-        # Fetch 5-day forecast
+        # Get 5-day weather forecast based on coordinates
         params = {
             "lat": lat,
             "lon": lon,
             "appid": self.api_key,
-            "units": "metric"
+            "units": "metric"  # Return temperature in Celsius
         }
-        try:
-            response = requests.get(self.forecast_url, params=params)
-            response.raise_for_status()
-            data = response.json()
+        response = requests.get(self.forecast_url, params=params)
+        response.raise_for_status()  # Check for errors
+        data = response.json()
+        forecast = []
+        for i in range(0, len(data['list']), 8):  # Get forecast every 8 hours (for 5 days)
+            day = data['list'][i]
+            forecast.append({
+                "dt": day['dt'],  # Date and time
+                "temp": day['main']['temp'],  # Temperature
+                "weather": day['weather'][0]['description'],  # Weather description
+                "weather_id": day['weather'][0]['id'],  # Weather condition ID
+                "wind": day['wind'],  # Wind data
+                "main": day['main']  # Main weather data (temp, pressure, humidity)
+            })
+        return forecast[:5]  # Return only the first 5 days
 
-            # Return the list of daily forecasts, the OpenWeatherMap API returns data in 3-hour intervals
-            forecast = []
-            for i in range(0, len(data['list']), 8):  # Every 8th entry is a 24-hour period (3 hours * 8 = 24)
-                day = data['list'][i]
-                forecast.append({
-                    "dt": day['dt'],
-                    "temp": day['main']['temp'],
-                    "weather": day['weather'][0]['description']
-                })
 
-            return forecast[:5]  # Only return 5 days of forecast
-        except requests.exceptions.RequestException as e:
-            print(f"Error retrieving 5-day forecast: {e}")
-            return None
+weather_service = WeatherService()  # Initialize weather service
+
+
+# API Routes
+@app.route('/get-coordinates', methods=['GET'])
+def get_coordinates():
+    # Route to get city coordinates
+    city_name = request.args.get('city')
+    lat, lon = weather_service.get_coordinates(city_name)
+    return jsonify({'latitude': lat, 'longitude': lon})  # Return coordinates
+
+
+@app.route('/5-day-forecast', methods=['GET'])
+def five_day_forecast():
+    # Route to get 5-day weather forecast
+    lat = float(request.args.get('lat'))
+    lon = float(request.args.get('lon'))
+    forecast = weather_service.get_5_day_forecast(lat, lon)
+    return jsonify(forecast)  # Return forecast
+
+
+if __name__ == '__main__':
+    app.run(debug=True)  # Start the Flask app in debug mode
